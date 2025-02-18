@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
-from schemas import Products, PostProducts
+from schemas import Products, PostProducts, ProductUpdate
 
 
 app = FastAPI()
@@ -30,15 +30,7 @@ products = [
     {"id": 19, "name": "Гель для душа Axe Black", "price": 349, "category": "Косметика и парфюмерия", "brand": "Axe"},
     {"id": 20, "name": "Тушь для ресниц Maybelline Lash Sensational", "price": 699, "category": "Косметика и парфюмерия", "brand": "Maybelline"}
 ]
-
-
-def delete_product(id):
-    for i in products:
-        if i["id"] == id:
-            products.remove(i)
-            return
-        else:
-            raise HTTPException(status_code=404, detail='Item not found')
+    
 
 @app.get('/products',response_model=list[Products], summary='get all products')
 async def all_products():
@@ -51,6 +43,7 @@ async def one_product(product_id: int):
         raise HTTPException(status_code=404, detail='Item not found')
     return products[product_id-1]
 
+
 @app.post('/products', status_code=status.HTTP_201_CREATED, response_model=Products, summary='post product')
 async def post_product(product: PostProducts):
     new_product = {"id": len(products)+1, **product.model_dump()}
@@ -60,5 +53,20 @@ async def post_product(product: PostProducts):
 
 @app.delete('/products/{product_id}', status_code=status.HTTP_204_NO_CONTENT, summary='delete product by id')
 async def del_product(product_id: int):
-    delete_product(product_id)
-    return 
+    for i in products:
+        if i["id"] == product_id:
+            print(product_id)
+            products.pop(product_id-1)
+            return
+
+        raise HTTPException(status_code=404, detail='Item not found')
+
+
+@app.patch('/products/{product_id}', summary='update product')
+async def post_product(product: ProductUpdate, product_id: int):
+    if len(products) < product_id:
+        raise HTTPException(status_code=404, detail='Item not found')
+    
+    update_data = product.model_dump(exclude_unset=True)
+    products[product_id-1].update(update_data)
+    return products[product_id-1]

@@ -14,3 +14,10 @@ class PostProducts(BaseModel):
     price: int
     category: str
     brand: str
+
+
+class ProductUpdate(BaseModel):
+    name: str | None = None
+    price: int | None = None
+    category: str | None = None
+    brand: str | None = None
