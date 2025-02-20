@@ -7,6 +7,9 @@ class Products(BaseModel):
     price: int
     category: str
     brand: str
+    
+    class Config:
+        from_attributes = True
 
 
 class PostProducts(BaseModel):
@@ -14,6 +17,9 @@ class PostProducts(BaseModel):
     price: int
     category: str
     brand: str
+    
+    class Config:
+        from_attributes = True
 
 
 class ProductUpdate(BaseModel):
