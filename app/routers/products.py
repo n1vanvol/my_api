@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status, APIRouter
+from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy import select, update
 from app.schemas import Products, PostProducts, ProductUpdate
 from app.database import get_db
@@ -24,7 +24,7 @@ async def one_product(product_id: int, db: AsyncSession = Depends(get_db)):
         return product
     raise HTTPException(status_code=404, detail='Item not found')
 
-@router.post('/products', status_code=status.HTTP_201_CREATED, response_model=Products, summary='post product')
+@router.post('/products', status_code=201, response_model=Products, summary='post product')
 async def post_product(product: PostProducts, db: AsyncSession = Depends(get_db)):
     new_product = StoreProducts(**product.model_dump())
     db.add(new_product) 
@@ -33,7 +33,7 @@ async def post_product(product: PostProducts, db: AsyncSession = Depends(get_db)
     return new_product
 
 
-@router.delete('/products/{product_id}', status_code=status.HTTP_204_NO_CONTENT, summary='delete product by id')
+@router.delete('/products/{product_id}', status_code=204, summary='delete product by id')
 async def del_product(product_id: int, db: AsyncSession = Depends(get_db)):
     delete_product = await db.execute(select(StoreProducts).filter(StoreProducts.id == product_id))
     product = delete_product.scalar_one_or_none()

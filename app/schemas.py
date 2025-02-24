@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
-
+from datetime import datetime
 class Products(BaseModel):
     id: int
     name: str
@@ -27,3 +27,20 @@ class ProductUpdate(BaseModel):
     price: int | None = None
     category: str | None = None
     brand: str | None = None
+
+
+
+class User(BaseModel):
+    
+    email: EmailStr
+    password: str
+
+    class Config:
+        from_attributes = True
+
+
+
+class UserInfo(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
