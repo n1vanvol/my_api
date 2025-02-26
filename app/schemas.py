@@ -44,3 +44,11 @@ class UserInfo(BaseModel):
     id: int
     email: EmailStr
     created_at: datetime
+
+class UserIn(BaseModel):
+    sub: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
