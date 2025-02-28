@@ -7,12 +7,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Users, Carts
 from sqlalchemy.exc import IntegrityError
 from ..security import hash_password, verify_password
-from ..auth import create_access_token, verify_access_token
+from ..auth import create_access_token, verify_access_token, get_current_user
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
+
 router = APIRouter(
     tags=['Users'],
     prefix='/users'
 )
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
+
 
 @router.post('/register',status_code=201)
 async def register_user(user: User, db: AsyncSession = Depends(get_db)):
@@ -47,16 +51,12 @@ async def login_user(data: dict = Depends(OAuth2PasswordRequestFormStrict), db: 
     
 
 @router.get("/me", response_model=UserInfo)
-async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
-    user_data = verify_access_token(token)
-    
-    query = await db.execute(select(Users).filter(Users.email == user_data["sub"]))
-    user = query.scalar_one_or_none()
-    
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return user
+async def get_logged_user(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+
+
+
 
 
 
